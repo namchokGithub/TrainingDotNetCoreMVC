@@ -13,7 +13,7 @@ namespace Movie.Controllers
         {
             var db = new MyProjectContext();
             var movie = db.Movie.ToList();
-            return View();
+            return View (movie);
         }
 
         public string Welcome(string name, string id)
