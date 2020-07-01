@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Movie.Models
 {
@@ -7,7 +6,7 @@ namespace Movie.Models
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=blog.db");
+            optionsBuilder.UseSqlite("Data source=database/myDB.db");
         }
 
         public DbSet<MovieModel> Movie { get; set; }
