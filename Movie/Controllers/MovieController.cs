@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Movie.Models;
 
 namespace Movie.Controllers
@@ -23,16 +24,16 @@ namespace Movie.Controllers
             return $"Hello, Your name's {name}, your id's {id}";
         }
 
+        /*
+        * Insert data to database
+        * Author: Nachok
+        * Date: 2020-07-02
+        */
         public IActionResult Create()
         {
             return View();
         }
 
-        /*
-         * Insert data to database
-         * Author: Nachok
-         * Date: 2020-07-02
-         */
         [HttpPost]
         public async Task<IActionResult> Create(MovieModel model, IFormFile fileUpload)
         {
@@ -77,7 +78,7 @@ namespace Movie.Controllers
         }
 
         /*
-         * Insert data to database
+         * Delete
          * Author: Nachok
          * Date: 2020-07-02
          */
@@ -89,5 +90,65 @@ namespace Movie.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        /*
+         * Edit data
+         * Author: Namchok
+         * Date: 2020-07-02
+         */
+
+        public ActionResult Edit(int id)
+        {
+            MovieModel movie = db.Movie.Find(id);
+            return View(movie);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(MovieModel model, IFormFile fileUpload)
+        {
+            if (model.duration < 1)
+            {
+                ModelState.AddModelError("errDuration", "The duration field is required.");
+                return View();
+            }
+
+            // Set old data
+            db.Movie.Attach(model);
+            MovieModel oldMovie = new MyProjectContext().Movie.Find(model.id);
+            model.coverImg = oldMovie.coverImg;
+            model.createDate = oldMovie.createDate;
+            oldMovie = null;
+
+            if(ModelState.IsValid)
+            {
+                if(fileUpload != null)
+                {
+                    string pathImgMovie = "/image/movie/";
+                    string pathSave = $"wwwroot{pathImgMovie}";
+                    if (!Directory.Exists(pathSave))
+                    {
+                        Directory.CreateDirectory(pathSave);
+                    }
+                    string extFile = Path.GetExtension(fileUpload.FileName);
+                    string fileName = DateTime.Now.ToString("dd-MM-yyyy-hh-mm-ss") + extFile;
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathSave, fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await fileUpload.CopyToAsync(stream);
+                    }
+
+                    DateTime dateNow = DateTime.Now;
+                    model.coverImg = pathImgMovie + fileName;
+                }
+
+                model.modifyDate = DateTime.Now;
+                db.Entry(model).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+
     }
 }

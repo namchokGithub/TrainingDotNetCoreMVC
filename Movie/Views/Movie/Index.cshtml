@@ -24,7 +24,7 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td class="item-id"><center>@item.id%</center></td>
+            <td class="item-id"><center>@item.id</center></td>
             <td>@item.title</td>
             <td>
                 <img src="@item.coverImg" height="80px" />
@@ -33,6 +33,7 @@
             <td>@item.genre</td>
             <td>@item.duration</td>
             <td>
+                @Html.ActionLink("แก้ไข", "Edit" , new { id = item.id }, new { id = item.id, @class = "btn btn-warning mr-2" })
                 <input type="button" value="Delete" class="btn btn-danger" />
             </td>
         </tr>
