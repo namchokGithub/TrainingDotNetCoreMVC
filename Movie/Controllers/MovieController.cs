@@ -31,28 +31,44 @@ namespace Movie.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(MovieModel model, IFormFile fileUpload)
         {
-            string pathImgMovie = "/image/movie/";
-            string pathSave = $"wwwroot{pathImgMovie}";
-            if (!Directory.Exists(pathSave))
+            if (model.duration < 1)
             {
-                Directory.CreateDirectory(pathSave);
-            }
-            string extFile = Path.GetExtension(fileUpload.FileName);
-            string fileName = DateTime.Now.ToString("dd-MM-yyyy-hh-mm-ss") + extFile;
-            var path = Path.Combine(Directory.GetCurrentDirectory(), pathSave, fileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await fileUpload.CopyToAsync(stream);
+                ModelState.AddModelError("errDuration", "The duration field is required.");
+                return View();
             }
 
-            DateTime dateNow = DateTime.Now;
-            model.coverImg = pathImgMovie + fileName;
-            model.createDate = dateNow;
-            model.modifyDate = dateNow;
-            db.Movie.Add(model);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (fileUpload == null)
+            {
+                ModelState.AddModelError("errFileUpload", "The file upload field is required.");
+                return View();
+            }
+
+            if (ModelState.IsValid)
+            {
+                string pathImgMovie = "/image/movie/";
+                string pathSave = $"wwwroot{pathImgMovie}";
+                if (!Directory.Exists(pathSave))
+                {
+                    Directory.CreateDirectory(pathSave);
+                }
+                string extFile = Path.GetExtension(fileUpload.FileName);
+                string fileName = DateTime.Now.ToString("dd-MM-yyyy-hh-mm-ss") + extFile;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), pathSave, fileName);
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await fileUpload.CopyToAsync(stream);
+                }
+
+                DateTime dateNow = DateTime.Now;
+                model.coverImg = pathImgMovie + fileName;
+                model.createDate = dateNow;
+                model.modifyDate = dateNow;
+                db.Movie.Add(model);
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return View();
         }
     }
 }
