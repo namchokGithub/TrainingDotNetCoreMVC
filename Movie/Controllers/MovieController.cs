@@ -28,6 +28,11 @@ namespace Movie.Controllers
             return View();
         }
 
+        /*
+         * Insert data to database
+         * Author: Nachok
+         * Date: 2020-07-02
+         */
         [HttpPost]
         public async Task<IActionResult> Create(MovieModel model, IFormFile fileUpload)
         {
@@ -69,6 +74,20 @@ namespace Movie.Controllers
                 return RedirectToAction("Index");
             }
             return View();
+        }
+
+        /*
+         * Insert data to database
+         * Author: Nachok
+         * Date: 2020-07-02
+         */
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            MovieModel movie = db.Movie.Find(id);
+            db.Movie.Remove(movie);
+            db.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }
