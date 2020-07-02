@@ -14,7 +14,7 @@ namespace Movie.Models
         public DateTime? releaseDate { get; set; }
         public string genre { get; set; }
         public int duration { get; set; }
-        public DateTime? createDAte { get; set; }
+        public DateTime? createDate { get; set; }
         public DateTime? modifyDate { get; set; }
     }
 }
